@@ -13,4 +13,6 @@ export default {
     gray: '#666666',
     grayLight: '#ccc',
     black: '#0a0a0a',
+    orange:'#fc5e03',
+    blue:'#0e13ab'
 }

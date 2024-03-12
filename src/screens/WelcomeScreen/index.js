@@ -30,9 +30,9 @@ export default function WelcomeScreen({navigation}) {
         />
       </View>
       <View style={styles.contentContainer}>
-        <Text style={styles.headertext}>Hello</Text>
-        <Text style={styles.text}>Welcome to Social Bharat!</Text>
-        <Text style={styles.text}>One stop for all your needs!</Text>
+      <Text style={styles.logotextmain}>सर्वजन हिताय,<Text style={styles.logotextone}>सर्वजन सुखाय </Text> </Text>
+        <Text style={styles.text}>Welcome to <Text style={styles.logotextblue}>Social Bharat!</Text></Text>
+        <Text style={styles.textone}>One stop for all your needs!</Text>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={onPressSignin}>
             <Text style={styles.buttonText}>Sign-In</Text>
@@ -73,6 +73,12 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     textAlign: 'center',
+    color:colors.orange
+  },
+  textone:{
+    fontSize: 20,
+    textAlign: 'center',
+    color:colors.RegisterandLoginButton
   },
   buttonContainer: {
     flex: 1,
@@ -91,4 +97,21 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: 'center',
   },
+  logotextone:{
+    fontSize:27,
+    color:colors.orange,
+    textAlign:'center',
+    fontWeight:'bold',
+},
+logotextmain:{
+    marginBottom:30,
+    fontSize:27,
+    color:colors.RegisterandLoginButton,
+    textAlign:'center',
+    fontWeight:'bold',
+},
+logotextblue:{
+  color:colors.blue,
+  fontWeight:'bold'
+}
 });

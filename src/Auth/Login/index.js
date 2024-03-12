@@ -7,16 +7,22 @@ import {
   Image,
   ImageBackground
 } from 'react-native';
-import {useState} from 'react';
+import {useContext, useState} from 'react';
 import React from 'react';
 
 import { CommonActions } from '@react-navigation/native';
 import routes from '../../constants/routes';
 import colors from '../../constants/colors';
+import { AuthContext } from '../../context/AuthContext';
+
+
+
 export default function Login({navigation}) {
-  const handleSignIn = ()=>{
-    navigation.navigate(routes.HOME);
-    }
+
+
+  const [mobile,setMobile ]=useState(null);
+  const [password,setPassword] = useState(null);
+  const {login} = useContext(AuthContext);
   
   const onpressSignUp = ()=>{
     navigation.navigate(routes.SIGNUP);
@@ -35,11 +41,13 @@ export default function Login({navigation}) {
         <Text style={styles.centerheadtext}>Sign In</Text>
         <TextInput
           style={styles.inputbox}
-          placeholder="Enter your mobile number"></TextInput>
+          placeholder="Enter your mobile mobile"
+          onChangeText={(text) => setMobile(text)}></TextInput>
         <TextInput
           style={styles.inputbox}
-          placeholder="Enter your Password"></TextInput>
-        <TouchableOpacity style={styles.buttonbox} onPress={handleSignIn}>
+          placeholder="Enter your Password" 
+          onChangeText={(text) => setPassword(text)}></TextInput>
+        <TouchableOpacity style={styles.buttonbox} onPress={()=>{login(mobile,password)}}>
           <Text style={styles.buttontext}>Login With Password</Text>
         </TouchableOpacity>
         <Text style={styles.midtext}>OR</Text>
