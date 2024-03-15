@@ -1,4 +1,4 @@
-import Signout from '../Auth/SignOut';
+
 import Business from '../screens/Business';
 import Home from '../screens/HomeScreen';
 import Matrimonial from '../screens/Matrimonial';

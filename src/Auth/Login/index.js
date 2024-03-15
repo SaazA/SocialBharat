@@ -7,22 +7,37 @@ import {
   Image,
   ImageBackground
 } from 'react-native';
-import {useContext, useState} from 'react';
+import {useState} from 'react';
 import React from 'react';
 
 import { CommonActions } from '@react-navigation/native';
 import routes from '../../constants/routes';
 import colors from '../../constants/colors';
-import { AuthContext } from '../../context/AuthContext';
+import { useDispatch } from 'react-redux';
+import { LoginAction } from '../../redux/actions';
+import { LoginApi } from '../../apis/apicalls';
 
 
 
 export default function Login({navigation}) {
 
+const dispatch = useDispatch();
 
-  const [mobile,setMobile ]=useState(null);
+const handleLogin = async () => {
+  return LoginApi(mobile, password)
+  .then(response => {
+    const res = JSON.parse(response);
+    const Token = res.token.token
+      dispatch(LoginAction(Token));
+  })
+  .catch(error => {
+      console.log(error);
+  });
+};
+
+      const [mobile,setMobile ]=useState(null);
   const [password,setPassword] = useState(null);
-  const {login} = useContext(AuthContext);
+
   
   const onpressSignUp = ()=>{
     navigation.navigate(routes.SIGNUP);
@@ -47,7 +62,7 @@ export default function Login({navigation}) {
           style={styles.inputbox}
           placeholder="Enter your Password" 
           onChangeText={(text) => setPassword(text)}></TextInput>
-        <TouchableOpacity style={styles.buttonbox} onPress={()=>{login(mobile,password)}}>
+        <TouchableOpacity style={styles.buttonbox} onPress={handleLogin}>
           <Text style={styles.buttontext}>Login With Password</Text>
         </TouchableOpacity>
         <Text style={styles.midtext}>OR</Text>

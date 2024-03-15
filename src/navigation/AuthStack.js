@@ -6,8 +6,8 @@ import Login from '../Auth/Login';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import SignUp from '../Auth/SignUp';
 import AppStack from './AppStack';
-import routes from '../constants/routes';
-import Signout from '../Auth/SignOut';
+
+
 export default function AuthStack() {
     const stack = createNativeStackNavigator();
   return (
