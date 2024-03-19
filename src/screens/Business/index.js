@@ -21,7 +21,6 @@ export default function Business() {
       .then(response => response.json())
       .then(result => setData(result))
       .catch(error => console.log('error', error));
-      console.log("HSHSGSGSG"+data);
   }
   return (
     <ScrollView>

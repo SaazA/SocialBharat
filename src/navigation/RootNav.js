@@ -6,7 +6,7 @@ import AppStack from './AppStack';
 import { useSelector } from 'react-redux';
 
 const RootNav = () => {
-  const token = useSelector(state =>state.AuthReducer.authToken)
+  const token = useSelector(state =>state.AuthReducer.authToken);
   return (
     <NavigationContainer>
        {
