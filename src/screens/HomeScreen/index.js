@@ -6,11 +6,13 @@ import {
   Image,
   Dimensions,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
+import { Card,Paragraph,Title } from 'react-native-paper';
 import colors from '../../constants/colors';
 import { getCommunities, getHomePageData } from '../../apis/apicalls';
-
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 const ImageSlider = ({images}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -24,7 +26,7 @@ const ImageSlider = ({images}) => {
 
   return (
     <View style={styles.sliderContainer}>
-      <Image source={images[currentIndex]} style={styles.sliderImage} resizeMode="cover"/>
+      <Image source={{uri:images[currentIndex]}} style={styles.sliderImage} resizeMode="cover"/>
     </View>
   );
 };
@@ -79,28 +81,25 @@ export default function Home({navigation}) {
   const [displayText, setDisplayText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [bannerphotos , setbannerphotos] = useState([]);
-  const [bannerData , setBannerData] = useState([]);
-  
-
+  const [aboutData  , setAboutData]  = useState({})
+  const [serviceData  , setServicesData]  = useState({})
+  const [aboutDataPhotos , setAboutDataPhotos] = useState('');
   const getHomeData = () => {
     try {
-      getHomePageData() 
+      getHomePageData()
         .then(response => {
-           const res = response;
-          // console.log("HEELELLEEEOEE"+JSON.stringify(res.data));
-           setBannerData(JSON.stringify(res.data.data.about.title) );
-           console.log("Banner"+bannerData);
-        }) 
-        .catch(error => { 
-          console.log(error); 
-        });
+         
+          setAboutData(response.about);
+          setServicesData(response.services);
+          setAboutDataPhotos(response.about.images);
+        })
+        .catch(error => {
+          console.log(error);
+        }); 
     } catch (error) {
       console.log(error);
     }
   };
-  
-  
-  
   
   const getCommuntybanners = () => {
     try {
@@ -113,17 +112,21 @@ export default function Home({navigation}) {
         }
         }) 
         .catch(error => {
-          console.log(error);
+          console.log("Community DATA ERROR1"+error);
         });
     } catch (error) {
-      console.log(error);
+      console.log("Community DATA ERROR2"+error);
     }
   };
   useEffect (()=>{
-    // getCommuntybanners()
-    getHomeData()
+     getCommuntybanners()
+   getHomeData()
   },[])
-  
+
+  const contentDataforabout = aboutData.content;
+  const strippedContentforabout = contentDataforabout ? contentDataforabout.replace(/<[^>]*>/g, '') : '';
+
+
   
   const DataHomePage = [
     {
@@ -172,24 +175,7 @@ export default function Home({navigation}) {
     },
   ];
 
-  const CardData = [
-    {
-      Heading:'Community Connect',
-      MainText:"Social Bharat's Community Connection feature facilitates interaction and engagement among individuals from various backgrounds, promoting a sense of unity and mutual understanding between different communities."
-    },
-    {
-      Heading:'Matrimonial',
-      MainText:"Social Bharat's matrimonial feature simplifies the search for a life partner by allowing users to create detailed profiles, express their preferences, and find compatible matches within a secure and private environment, making the journey to finding a life partner efficient and personalized."
-    },
-    {
-      Heading:'Business Promotion',
-      MainText:"Social Bharat provides a powerful platform for businesses to connect with their target audience, enhance their online presence, and effectively promote their products and services, ensuring increased visibility and growth opportunities in the digital landscape."
-    },
-    {
-      Heading:'Job Posting',
-      MainText:"Social Bharat's job posting feature enables employers to effortlessly connect with potential candidates, facilitating seamless recruitment. It streamlines the hiring process, making it efficient for businesses to find the right talent and for job seekers to discover promising opportunities within our platform."
-    }
-  ]
+ 
   useEffect(() => {
     let currentText = '';
 
@@ -205,7 +191,7 @@ export default function Home({navigation}) {
 
     return () => clearInterval(intervalId);
   }, [currentIndex]);
-  const imagePaths = DataHomePage.map(item => item.image);
+
   return (
     <ScrollView>
       <View style={{flex: 1}}>
@@ -221,44 +207,90 @@ export default function Home({navigation}) {
         </ImageBackground>
         </View>
         <View>
-          <SliderBanner images={bannerphotos} />
+          <SliderBanner images={bannerphotos} /> 
         </View>
         <View style={styles.sliderBoxContainer}> 
           <View style={styles.contectboxslider}>
             <View>
-              <Text style={styles.sliderContainertextmain}>{bannerData.about}</Text>
-              <Text style={styles.sliderContainertext}>Connecting Communities with Privacy & Matrimonial Excellence.</Text>
+              <Text style={styles.sliderContainertextmain}>{aboutData.title}</Text>
+              <Text style={styles.sliderContainertext}>{aboutData.subtitle}</Text>
             </View>
             <View>
-              <Text style={styles.answertext}><Text>#</Text>Discover and participate in communities you love.</Text>
-              <Text style={styles.answertext}><Text>#</Text>Trustworthy profiles for a secure matrimonial experience.</Text>
-              <Text style={styles.answertext}><Text>#</Text>Private Sharing in Chosen Communities.Find Life Partners with Privacy.</Text>
-              <Text style={styles.answertext}><Text>#</Text>Elevate your business to new heights</Text>
-              <Text style={styles.answertext}><Text>#</Text>Plan and attend events with friends and 
-              like-minded individuals.</Text>
+              <Text style={styles.answertext}>{strippedContentforabout}</Text>
+             
             </View>
           </View>
-          {/* <ImageSlider images={imagePaths}/> */}
+          {aboutDataPhotos && (
+  <ImageSlider images={aboutDataPhotos} />
+)}
         </View>
-
-      <View style={styles.cardcontentbox}>
-        <Text style={styles.cardcontentheading}>Social Bharat Provides</Text>
         <View>
-  {CardData.map((item, index) => (
-    <View key={index} style={styles.cardbox}>
-      <Text style={styles.cardboxheading}>{item.Heading}</Text>
-      <Text style={styles.cardboxtext}>{item.MainText}</Text>
-    </View>
-  ))}
+  <Text style={styles.cardcontentheading}>{serviceData.section_title}</Text>
+  {serviceData && serviceData.items ? (
+    serviceData.items.map((item, index) => (
+      <Card key={index} style={{margin:20 ,  elevation: 5}}>
+        <Card.Content style={styles.cardContent}>
+          <View style={styles.cardRow}>
+          <View>
+              {index % 4 === 0 ? (
+                <FontAwesome5 name="handshake" size={24} style={styles.icon} />
+              ) : index % 4 === 1 ? (
+                <FontAwesome5 name="ring" size={24} style={styles.icon} />
+              ) : index % 4 === 2 ? (
+                <FontAwesome5 name="briefcase" size={24} style={styles.icon} />
+              ) : (
+                <FontAwesome5 name="list" size={24} style={styles.icon} />
+              )}
+            </View>
+            <View style={styles.cardContent}>
+              
+              <Title style={styles.cardTitle}>{item.title}</Title>
+              <Paragraph style={styles.para}>{item.content.replace(/<\/?p>/g, '')}</Paragraph>
+            </View>
+          </View>
+        </Card.Content>
+      </Card>
+    ))
+  ) : (
+    <ActivityIndicator size="large" color="#0000ff" />
+  )}
 </View>
-      </View>
+
+
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  marque_text: {},
+
+  cardContainer: {
+    marginBottom: 20,
+  },
+  cardRow: {
+    flexDirection: 'row',
+  },
+  cardContent: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  para: {
+    color: 'black',
+    fontWeight: 'bold',
+    marginTop: 10,
+    fontSize: 16,
+    marginRight: 5,
+  },
+  icon: {
+    marginRight:5,
+      marginTop:5,
+    color: '#0066CC',
+  },
   image: {
     justifyContent: 'center',
     height:'100%'
@@ -300,6 +332,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
   },
+  
   imageone: {
     width: 90,
     height: 80,
@@ -325,10 +358,7 @@ const styles = StyleSheet.create({
   },
   answertext:{
     color:colors.black,
-    fontSize:15,
-    margin:5,
-  },
-  cardcontentbox:{
+    fontSize:20,
     margin:5,
   },
   cardcontentheading:{
@@ -336,17 +366,6 @@ const styles = StyleSheet.create({
     textAlign:'center',
     fontSize:30,
     fontWeight:'bold'
-  },
-  cardboxheading:{
-    color:colors.black,
-    fontSize:20
-  },
-  cardboxtext:{
-    color:colors.black,
-    fontSize:15
-  },
-  cardbox:{
-    margin:10
   },
   mainimagecontainer:{
     flex:1,
