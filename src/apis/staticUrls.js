@@ -1,11 +1,19 @@
 export const BASE_URL = 'https://uat-api.socialbharat.org/api';
 
-
-export const GET_CITIES="/cities/";
-export const LOGIN_API = "/login-by-password";
-export const GET_USER_COMMUNITY_BY_ID = "/communityBYId";
-export const GET_COMMUNITIES = "/all-active-bharatMandir";
-export const GET_STATES = "/states/101";
-export const GET_HOME_PAGE_DATA = "/pages/home";
-export const GET_SUBCASTES = "/fetch/11/subcasts";
-export const GET_PARTNER = "/partner/search";
+export const GET_CITIES = '/cities/';
+export const LOGIN_API = '/login-by-password';
+export const GET_USER_COMMUNITY_BY_ID = '/communityBYId';
+export const GET_COMMUNITIES = '/all-active-bharatMandir';
+export const GET_STATES = '/states/101';
+export const GET_HOME_PAGE_DATA = '/pages/home';
+export const GET_SUBCASTES = '/fetch/11/subcasts';
+export const GET_PARTNER = '/partner/search';
+export const GET_PROFILE = '/user/profile';
+export const GET_BUSINESSES = '/business/search';
+export const GET_CHAT_MATRIMONIAL = '/chat';
+export const SEND_MESSAGE_MATRIMONIAL = '/chat/send-message';
+export const GET_MEMBERS = '/users/search';
+export const GET_USER_SERVICES = '/user/services';
+export const CREATE_SERVICE = '/user/service/create';
+export const GET_SERVICE_ON_SEARCH = '/search/users/service';
+export const GET_SERVICE_REGISTERED_BY_USER='/user/services/registered';
