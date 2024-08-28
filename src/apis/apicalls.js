@@ -1003,7 +1003,7 @@ export const createMatrimonialProfile = (
         resolve(response.data);
       })
       .catch(error => {
-        console.error('Error posting data createMatrimonialProfile:', error);
+        // console.error('Error posting data createMatrimonialProfile:', error);
         reject(error);
       });
   });

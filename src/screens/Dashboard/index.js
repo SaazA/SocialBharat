@@ -1,9 +1,18 @@
-import {View, Text, StyleSheet, Image, Pressable} from 'react-native';
-import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Pressable,
+  ToastAndroid,
+} from 'react-native';
+import React, {useEffect} from 'react';
 import {ScrollView, TouchableOpacity} from 'react-native-gesture-handler';
 import colors from '../../constants/colors';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import routes from '../../constants/routes';
+import {useSelector} from 'react-redux';
+import {getCommunitybyid} from '../../apis/apicalls';
 
 const cardcontainerupper = colorcode => ({
   backgroundColor: colorcode,
@@ -40,7 +49,7 @@ const Dashboard = ({navigation}) => {
       cart_edit_action: 'Edit',
       card_icon_file: require('../../assests/activities.png'),
       card_nav: routes.PROFILESCREEN,
-      card_post_nav: routes.CREATENEWJOB,
+      card_post_nav: routes.EDITPROFILE,
     },
     {
       color: '#6C757D',
@@ -140,6 +149,7 @@ const Dashboard = ({navigation}) => {
   //   Business,
 
   // ]
+
   return (
     <ScrollView>
       {card_data.map((el, index) => (

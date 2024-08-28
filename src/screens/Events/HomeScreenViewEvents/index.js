@@ -104,12 +104,16 @@ const EventsScreen = ({navigation}) => {
   const handleClearCityDropdown = () => {
     setSelectedCity(null);
     setSelectedCityIdandName(null);
+    setEventData([]);
+    Searchevent(searchText, 1, selectedState, selectedCity);
     setDataLoadedforCity(false);
   };
   const handleCityIdAndName = selectedItem => {
     const selectedId = parseInt(selectedItem.value);
     const selectedName = cityData.find(city => city.id === selectedId)?.name;
     setSelectedCity(selectedName);
+    setEventData([]);
+    Searchevent(searchText, 1, selectedState, selectedName);
   };
 
   const handleStateDropdown = selectedItem => {
@@ -124,6 +128,8 @@ const EventsScreen = ({navigation}) => {
     setDataLoadedforState(false);
     setCityData(null);
     setSelectedCity(null);
+    setEventData([]);
+    Searchevent(searchText, 1, selectedState, selectedCity);
     // handleClearCityDropdown();
     setDataLoadedforCity(false);
   };
@@ -133,6 +139,8 @@ const EventsScreen = ({navigation}) => {
     setSelectedState(selectedName);
     console.log('Selected Name:', selectedName);
     console.log('Selected ID:', selectedId);
+    setEventData([]);
+    Searchevent(searchText, 1, selectedName, selectedCity);
     getCitiesData(selectedId);
     setDataLoadedforState(true);
   };
@@ -266,7 +274,7 @@ const EventsScreen = ({navigation}) => {
             />
           </View>
 
-          <ScrollView style={styles.scrollviewcont} nestedScrollEnabled={true}>
+          {/* <ScrollView style={styles.scrollviewcont} nestedScrollEnabled={true}>
             {eventData &&
               eventData.map((item, index) => (
                 <View key={index} style={styles.card}>
@@ -326,6 +334,72 @@ const EventsScreen = ({navigation}) => {
                   </View>
                 </View>
               ))}
+          </ScrollView> */}
+          <ScrollView style={styles.scrollviewcont} nestedScrollEnabled={true}>
+            {eventData && eventData.length > 0 ? (
+              eventData.map((item, index) => (
+                <View key={index} style={styles.card}>
+                  <View style={styles.imagecontainer}>
+                    <Image
+                      style={styles.cardImage}
+                      source={
+                        item.business_photos
+                          ? Array.isArray(item.business_photos)
+                            ? {uri: item.business_photos[0]}
+                            : {uri: item.business_photos}
+                          : require('../../../assests/nullphotocover.jpg')
+                      }
+                    />
+                  </View>
+                  <Text style={styles.cardheadtext}>{item.title}</Text>
+                  <Text style={styles.cardcategorytext}>({item.name})</Text>
+
+                  {[
+                    {label: 'Job title', value: item.event_type},
+                    {label: 'Company Name:', value: item.venue},
+                    {
+                      label: 'Application Start:',
+                      value: item.start_datetime
+                        ? moment(item.start_datetime).format('MMMM Do YYYY')
+                        : 'NA',
+                    },
+                    {
+                      label: 'Expire Date:',
+                      value: item.end_datetime
+                        ? moment(item.end_datetime).format('MMMM Do YYYY')
+                        : 'NA',
+                    },
+                  ].map((info, index) => (
+                    <Dividedboxcontainer
+                      key={index}
+                      label={info.label}
+                      value={info.value}
+                    />
+                  ))}
+
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      // borderWidth: 1,
+                    }}>
+                    <TouchableOpacity
+                      style={styles.cardshowinfo}
+                      onPress={() =>
+                        navigation.navigate(routes.VIEWSPECIFICEVENT, {
+                          id: item.id,
+                        })
+                      }>
+                      <Text style={styles.showmoretext}>Show More</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))
+            ) : (
+              <View style={styles.nomoretextcontainer}>
+                <Text style={styles.nomoretext}>No Data Available</Text>
+              </View>
+            )}
           </ScrollView>
         </View>
       ) : (
@@ -378,8 +452,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
   },
   dropdownoutsidecontainer: {
-    marginTop: 10,
-    padding: 10,
+    marginTop: 5,
+    padding: 5,
   },
   searchTextInput: {
     color: colors.black,
@@ -422,7 +496,12 @@ const styles = StyleSheet.create({
   },
   scrollviewcont: {
     maxHeight: 400,
+    borderWidth: 2,
     minHeight: 200,
+    backgroundColor: colors.white,
+    borderColor: colors.primary,
+    borderRadius: 10,
+    marginBottom: 10,
   },
   card: {
     alignItems: 'center',

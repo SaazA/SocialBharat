@@ -99,7 +99,6 @@ const AddAddress = ({navigation}) => {
     setSelectedCity(null);
     setSelectedCityIdandName(null);
     setDataLoadedforCity(false);
-    setCurrentPage(1);
   };
   const handleCityIdAndName = selectedItem => {
     const selectedId = parseInt(selectedItem.value);

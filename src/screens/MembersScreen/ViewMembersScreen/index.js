@@ -71,7 +71,8 @@ const ViewMembers = ({route}) => {
     if (bioDataUrl) {
       Linking.openURL(bioDataUrl);
     } else {
-      Alert.alert('No Bio Data Available');
+      errorMessage = 'No Bio Data Available';
+      ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
     }
   };
   useEffect(() => {
@@ -257,18 +258,6 @@ const ViewMembers = ({route}) => {
                       ))}
 
                       {/* TouchableOpacity for additional functionality */}
-                      <View style={styles.content}>
-                        <View style={styles.textbox}>
-                          <Text style={styles.contenttextstatic}>BioData</Text>
-                        </View>
-                        <TouchableOpacity
-                          style={styles.infobox}
-                          onPress={handleBioDataPress}>
-                          <Text style={styles.contenttextDynamic}>
-                            Download Biodata
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
                       <View style={styles.content}>
                         <View style={styles.textbox}>
                           <Text style={styles.contenttextstatic}>BioData</Text>

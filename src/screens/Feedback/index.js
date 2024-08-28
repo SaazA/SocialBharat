@@ -32,7 +32,27 @@ const FeedbackScreen = ({navigation}) => {
         formsubmitted();
       })
       .catch(error => {
-        const errorMessage = error.message || 'An unexpected error occurred';
+        // const errorMessage = error.message || 'An unexpected error occurred';
+        let errorMessage = 'An unexpected error occurred';
+
+        if (error.response) {
+          // Check if the response has data
+          if (error.response.data) {
+            const errorData = error.response.data;
+
+            // Check if there are specific errors or a general message
+            if (errorData.errors) {
+              // Extract the first error message, you can adjust this logic as needed
+              const firstErrorKey = Object.keys(errorData.errors)[0];
+              errorMessage = errorData.errors[firstErrorKey];
+            } else if (errorData.message) {
+              errorMessage = errorData.message;
+            }
+          }
+        } else {
+          // If no response, use the error's message
+          errorMessage = error.message;
+        }
 
         // Show the error message in a toast
         ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
@@ -53,8 +73,8 @@ const FeedbackScreen = ({navigation}) => {
     const errors = [];
 
     // Perform validations for each field
-    if (!feedback) {
-      errors.push('Please Fill out all the Mandatory Details');
+    if (!feedback || !feedback.trim()) {
+      errors.push('Please Fill out the FeedBack Details');
     }
     if (errors.length > 0) {
       const errorMessage = errors.join('\n'); // Join error messages with newline character

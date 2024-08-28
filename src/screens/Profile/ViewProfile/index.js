@@ -241,11 +241,7 @@ const ProfileScreen = ({navigation}) => {
           <View style={styles.personalinfocontainer}>
             <TouchableOpacity
               style={styles.editcontainer}
-              onPress={() =>
-                navigation.navigate(routes.EDITPROFILE, {
-                  community: communityname,
-                })
-              }>
+              onPress={() => navigation.navigate(routes.EDITPROFILE)}>
               <FontAwesome5 size={24} name="edit" color={colors.black} />
             </TouchableOpacity>
 

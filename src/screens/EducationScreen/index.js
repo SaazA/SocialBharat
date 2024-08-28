@@ -98,6 +98,37 @@ const EducationUpdate = ({navigation}) => {
       });
   };
 
+  // const handleTextChange = text => {
+  //   console.log(text);
+  //   // Remove non-digit characters and prevent starting with spaces
+  //   const input = text.replace(/[^0-9]/g, ''); // Keep only digits
+
+  //   if (text.startsWith(' ')) {
+  //     ToastAndroid.show('Input cannot start with spaces', ToastAndroid.SHORT);
+  //     setPassingYear(''); // Clear the input if it starts with a space
+  //   } else {
+  //     setPassingYear(input); // Set the valid input
+  //   }
+  // };
+
+  const handleTextChange = (text, type) => {
+    let input;
+
+    if (type === 'year') {
+      // Remove non-digit characters for the year input
+      input = text.replace(/[^0-9]/g, ''); // Keep only digits
+      if (text.startsWith(' ')) {
+        ToastAndroid.show('Input cannot start with spaces', ToastAndroid.SHORT);
+        input = ''; // Clear the input if it starts with a space
+      }
+      setPassingYear(input);
+    } else if (type === 'score') {
+      // Allow decimal numbers for the score input
+      input = text.replace(/[^0-9.]/g, ''); // Keep only digits and a decimal point
+      setScore(input);
+    }
+  };
+
   const handleNav = () => {
     navigation.navigate(routes.PROFILESCREEN);
   };
@@ -278,16 +309,33 @@ const EducationUpdate = ({navigation}) => {
                 placeholderTextColor={colors.black}
               />
             </View>
+            {/* <View style={styles.inputcontainerwithlabel}>
+              <Text style={styles.labeltext}>
+                Passing Year <Text style={{color: colors.danger}}>*</Text>
+              </Text>
+              <TextInput
+                style={styles.inputBox}
+                onChangeText={text => handleTextChange(text)}
+                placeholder="Enter Year"
+                placeholderTextColor={colors.black}
+                keyboardType="numeric"
+                maxLength={4}
+                value={passingYear}
+              />
+            </View> */}
+
             <View style={styles.inputcontainerwithlabel}>
               <Text style={styles.labeltext}>
                 Passing Year <Text style={{color: colors.danger}}>*</Text>
               </Text>
               <TextInput
                 style={styles.inputBox}
-                onChangeText={text => setPassingYear(text)}
+                onChangeText={text => handleTextChange(text, 'year')}
                 placeholder="Enter Year"
                 placeholderTextColor={colors.black}
                 keyboardType="numeric"
+                maxLength={4}
+                value={passingYear}
               />
             </View>
 
@@ -330,7 +378,7 @@ const EducationUpdate = ({navigation}) => {
                 }}
               />
             </View>
-            <View style={styles.inputcontainerwithlabel}>
+            {/* <View style={styles.inputcontainerwithlabel}>
               <Text style={styles.labeltext}>
                 Score <Text style={{color: colors.danger}}>*</Text>
               </Text>
@@ -340,6 +388,20 @@ const EducationUpdate = ({navigation}) => {
                 keyboardType="decimal-pad"
                 placeholder="Enter Score"
                 placeholderTextColor={colors.black}
+              />
+            </View> */}
+            <View style={styles.inputcontainerwithlabel}>
+              <Text style={styles.labeltext}>
+                Score <Text style={{color: colors.danger}}>*</Text>
+              </Text>
+              <TextInput
+                style={styles.inputBox}
+                onChangeText={text => handleTextChange(text, 'score')}
+                keyboardType="decimal-pad"
+                placeholder="Enter Score"
+                placeholderTextColor={colors.black}
+                value={score}
+                maxLength={5}
               />
             </View>
           </View>

@@ -13,6 +13,7 @@ import React, {useEffect, useState, useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import {
   getCities,
+  getCommunitybyid,
   getProfile,
   getState,
   SearchEvents,
@@ -28,7 +29,7 @@ import {ActivityIndicator} from 'react-native';
 
 const EditProfile = ({route, navigation}) => {
   const token = useSelector(state => state.AuthReducer.authToken);
-  const {community} = route.params;
+  // const {community} = route.params;
   // console.log(community);
 
   const [selectedCity, setSelectedCity] = useState('');
@@ -58,6 +59,28 @@ const EditProfile = ({route, navigation}) => {
   const [maritalValue, setMaritalValue] = useState();
   const [refreshing, setRefreshing] = useState(false);
   const [apiFailed, setApiFailed] = useState(false);
+  const [communityName, setCommunityName] = useState();
+
+  useEffect(() => {
+    getusercommunity();
+  }, []);
+
+  const Community_id = useSelector(state => state.UserReducer.userData.data.id);
+  const getusercommunity = () => {
+    getCommunitybyid(Community_id, token)
+      .then(response => {
+        console.log(response);
+        setCommunityName(response.data.name);
+      })
+      .catch(error => {
+        // console.log(error);
+        const errorMessage = error.message || 'An unexpected error occurred';
+
+        // Show the error message in a toast
+        ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+        setApiFailed(true);
+      });
+  };
 
   const id = useSelector(state => state.UserReducer.userData.data.id);
   const getUserProfile = () => {
@@ -322,6 +345,41 @@ const EditProfile = ({route, navigation}) => {
     setDataLoadedForEducation(false);
   };
 
+  const calculateAge = dob => {
+    const today = new Date();
+    const birthDate = new Date(dob);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    // Check if the birthday has passed this year
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
+  const handleDobChange = text => {
+    // Perform the age validation
+    if (text.length === 10) {
+      // Check if the date format is complete
+      const age = calculateAge(text);
+
+      if (age < 18) {
+        ToastAndroid.show(
+          'You must be at least 18 years old.',
+          ToastAndroid.SHORT,
+        );
+        return;
+      } else {
+        setChangedDob(text);
+      }
+    }
+  };
+
   const handleSubmit = () => {
     // Initialize an array to store error messages for each field
     const errors = [];
@@ -364,6 +422,34 @@ const EditProfile = ({route, navigation}) => {
     // All fields are filled, proceed with form submission
   };
 
+  // const validateDateInput = text => {
+  //   // Regex to check if the input follows YYYY-MM-DD format
+
+  //   const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  //   const isValidDate = datePattern.test(text) && isValidDateValue(text);
+
+  //   if (isValidDate || text === '') {
+  //     setChangedDob(text);
+  //   } else {
+  //     ToastAndroid.show(
+  //       'Invalid date format. Please use YYYY-MM-DD.',
+  //       ToastAndroid.SHORT,
+  //     );
+  //   }
+  // };
+
+  // const isValidDateValue = text => {
+  //   // Split the input into year, month, and day
+  //   const [year, month, day] = text.split('-').map(Number);
+
+  //   // Check if the year, month, and day are valid
+  //   const isValidYear = year >= 1000 && year <= 9999;
+  //   const isValidMonth = month >= 1 && month <= 12;
+  //   const isValidDay = day >= 1 && day <= 31;
+
+  //   // Simple day validation, consider improving this for month-specific day checks
+  //   return isValidYear && isValidMonth && isValidDay;
+  // };
   return (
     <ScrollView
       style={styles.maincontainer}
@@ -400,10 +486,11 @@ const EditProfile = ({route, navigation}) => {
             <TextInput
               style={styles.inputBox}
               defaultValue={changedDob}
-              onChangeText={text => setChangedDob(text)}
+              onChangeText={text => handleDobChange(text)}
               placeholder="YYYY-MM-DD"
-              placeholderTextColor={colors.black}
+              placeholderTextColor="black"
               keyboardType="number-pad"
+              maxLength={10}
             />
           </View>
 
@@ -476,7 +563,12 @@ const EditProfile = ({route, navigation}) => {
               </Text>
               <TouchableOpacity
                 style={styles.editcontainer}
-                onPress={() => setCityEdit(true)}>
+                onPress={() => {
+                  setCityEdit(true),
+                    setStateEdit(true),
+                    setSelectedCity(null),
+                    setSelectedState(null);
+                }}>
                 <FontAwesome5 size={24} name="edit" color={colors.black} />
               </TouchableOpacity>
             </View>
@@ -528,7 +620,7 @@ const EditProfile = ({route, navigation}) => {
             </Text>
             <TextInput
               style={styles.inputBox}
-              value={community}
+              value={communityName ? communityName : ''}
               editable={false}
               // onChangeText={text => setStreetAddress(text)}
             />

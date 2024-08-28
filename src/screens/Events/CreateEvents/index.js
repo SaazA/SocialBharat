@@ -698,6 +698,9 @@ const styles = StyleSheet.create({
   itemTextStyle: {
     color: colors.black,
   },
+  searchTextInput: {
+    color: colors.black,
+  },
   inputcontainerwithlabel: {
     marginTop: 10,
   },

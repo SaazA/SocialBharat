@@ -10,12 +10,13 @@ import {
 } from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import colors from '../../../constants/colors';
-
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import DocumentPicker from 'react-native-document-picker';
 import {ActivityPost, uploadImages} from '../../../apis/apicalls';
 import {useSelector} from 'react-redux';
 import {Image} from 'react-native';
 import routes from '../../../constants/routes';
+import {useFocusEffect} from '@react-navigation/native';
 // import { launchImageLibrary } from 'react-native-image-picker';
 //import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -38,6 +39,16 @@ const PostActivities = ({navigation}) => {
       setTitle(),
       setRefreshing(false);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      setCategory(null),
+        setCategoryName(null),
+        setDescription(),
+        setParsedPhotoData(),
+        setTitle();
+    }, []),
+  );
 
   const [imageUri, setImageUri] = useState([]);
 
@@ -162,6 +173,10 @@ const PostActivities = ({navigation}) => {
   //     });
   // };
 
+  const hanldeClearCategory = () => {
+    setCategory(null);
+    setCategoryName(null);
+  };
   return (
     <ScrollView
       contentContainerStyle={{backgroundColor: '#ffffff'}}
@@ -205,6 +220,26 @@ const PostActivities = ({navigation}) => {
             onChange={item => {
               setCategory(item.value);
               setCategoryName(item.label);
+            }}
+            renderRightIcon={() => {
+              if (category && categoryName !== null) {
+                return (
+                  <FontAwesome5
+                    name="trash"
+                    color={colors.orange}
+                    size={20}
+                    onPress={hanldeClearCategory}
+                  />
+                );
+              } else {
+                return (
+                  <FontAwesome5
+                    name="caret-down"
+                    color={colors.blue}
+                    size={28}
+                  />
+                );
+              }
             }}
           />
         </View>

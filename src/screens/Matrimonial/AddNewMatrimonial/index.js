@@ -182,11 +182,15 @@ const AddMatrimonial = ({navigation}) => {
         navigation.navigate(routes.MATRIMONIALSCREEN);
       })
       .catch(error => {
-        console.log(error);
+        // console.log(error);
         const {errors, message} = error.response.data;
         console.log(error, errors, message);
         // Alert.alert(JSON.stringify(errors));
         Alert.alert(Object.values(errors).join('\n'));
+        const errorMessage = error.message || 'An unexpected error occurred';
+
+        // Show the error message in a toast
+        ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
       });
   };
 
@@ -346,6 +350,16 @@ const AddMatrimonial = ({navigation}) => {
     const day = String(date.getDate()).padStart(2, '0');
     return `${day}-${month}-${year}`;
   };
+
+  const validateDate = selectedDate => {
+    const currentDate = new Date();
+    const age18 = new Date(
+      currentDate.getFullYear() - 18,
+      currentDate.getMonth(),
+      currentDate.getDate(),
+    );
+    return selectedDate <= age18;
+  };
   const formatDateforSending = date => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -440,15 +454,59 @@ const AddMatrimonial = ({navigation}) => {
 
   const mainHeight = `${sliderValueForFeet}.${sliderValueForInches} `;
 
+  // const selectDoc = () => {
+  //   return new Promise((resolve, reject) => {
+  //     DocumentPicker.pickSingle({
+  //       type: [DocumentPicker.types.pdf],
+  //     })
+  //       .then(doc => {
+  //         resolve(doc);
+  //         setDocumentData(doc.name);
+  //         UploadPDF(doc);
+  //       })
+  //       .catch(err => {
+  //         if (DocumentPicker.isCancel(err)) {
+  //           resolve();
+  //         } else {
+  //           reject(err);
+  //         }
+  //       });
+  //   });
+  // };
+
+  // const UploadPDF = data => {
+  //   console.log('Heyee', data);
+  //   uploadBiodataPdf(token, data)
+  //     .then(response => {
+  //       setParsedDocumentData(response.data.file);
+  //       console.log('parsedPDFData', response.data);
+  //     })
+  //     .catch(error => {
+  //       const errorMessage = error.message || 'An unexpected error occurred';
+
+  //       // Show the error message in a toast
+  //       ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+  //       setApiFailed(true);
+  //     });
+  // };
+
   const selectDoc = () => {
     return new Promise((resolve, reject) => {
       DocumentPicker.pickSingle({
         type: [DocumentPicker.types.pdf],
       })
         .then(doc => {
-          resolve(doc);
-          setDocumentData(doc.name);
-          UploadPDF(doc);
+          const fileSizeInMB = doc.size / (1024 * 1024); // Convert size to MB
+          if (fileSizeInMB > 5) {
+            // If file size exceeds 5 MB
+            const errorMessage = 'File size should not exceed 5 MB';
+            ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+            // reject(new Error(errorMessage));
+          } else {
+            resolve(doc);
+            setDocumentData(doc.name);
+            UploadPDF(doc);
+          }
         })
         .catch(err => {
           if (DocumentPicker.isCancel(err)) {
@@ -468,14 +526,9 @@ const AddMatrimonial = ({navigation}) => {
         console.log('parsedPDFData', response.data);
       })
       .catch(error => {
-        const errorMessage = error.message || 'An unexpected error occurred';
-
-        // Show the error message in a toast
-        ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
-        setApiFailed(true);
+        console.log('Error uploading pdf:', error);
       });
   };
-
   const UploadImage = data => {
     // console.log('Heyee', imageUri);
     uploadImages(token, data)
@@ -491,37 +544,6 @@ const AddMatrimonial = ({navigation}) => {
         setApiFailed(true);
       });
   };
-
-  // const selectPhoto = () => {
-  //   return new Promise((resolve, reject) => {
-  //     DocumentPicker.pick({
-  //       type: [DocumentPicker.types.images],
-  //       allowMultiSelection: true,
-  //     })
-  //     .then(documents => {
-  //       const selectedPhotos = documents.map(doc => doc.uri);
-  //       const numPhotos = selectedPhotos.length;
-  //       console.log(selectedPhotos);
-  //       UploadImage(documents);
-  //       if (numPhotos < 2 || numPhotos > 5) {
-  //         Alert.alert("Please select between 2 and 5 photos.");
-  //         // Remove all photos from state and UI
-  //         setImageUri([]);
-  //       } else {
-  //         // Set selected photos to state and UI
-  //         setImageUri(selectedPhotos);
-  //         resolve();
-  //       }
-  //     })
-  //       .catch(err => {
-  //         if (DocumentPicker.isCancel(err)) {
-  //           resolve()
-  //         }else{
-  //           reject(err)
-  //         }
-  //       });
-  //   });
-  // };
 
   const selectPhoto = () => {
     return new Promise((resolve, reject) => {
@@ -560,6 +582,10 @@ const AddMatrimonial = ({navigation}) => {
     const updatedImageUri = [...imageUri];
     updatedImageUri.splice(index, 1);
     setImageUri(updatedImageUri);
+
+    if (updatedImageUri.length === 0) {
+      setParsedPhotoData('');
+    }
   };
 
   const handleDeletePDF = () => {
@@ -581,6 +607,21 @@ const AddMatrimonial = ({navigation}) => {
       !selectedCity
     ) {
       errors.push('Please Fill out all the Mandatory Details');
+    }
+    // if (!validateDate(new Date(dateFormatted))) {
+    //   errors.push('You must be at least 18 years old.');
+    //   console.log('hh');
+    // }
+
+    console.log('Formatted Date:', dateFormatted);
+
+    // Validate the selected date
+    const isValidDate = validateDate(new Date(dateFormatted));
+    console.log('Is Valid Date:', isValidDate);
+
+    if (!isValidDate) {
+      errors.push('Age must be at least 18 years old.');
+      console.log('Date validation failed - User is under 18.');
     }
     if (errors.length > 0) {
       const errorMessage = errors.join('\n'); // Join error messages with newline character
@@ -757,10 +798,17 @@ const AddMatrimonial = ({navigation}) => {
                     mode="date"
                     open={open}
                     date={date}
-                    onConfirm={date => {
+                    onConfirm={selectedDate => {
+                      if (validateDate(selectedDate)) {
+                        setDate(selectedDate);
+                        console.log('Selected Date: ' + selectedDate);
+                      } else {
+                        Alert.alert(
+                          'Invalid Date',
+                          'You must be at least 18 years old.',
+                        );
+                      }
                       setOpen(false);
-                      setDate(date);
-                      console.log('assas' + date);
                     }}
                     onCancel={() => {
                       setOpen(false);
@@ -1020,6 +1068,8 @@ const AddMatrimonial = ({navigation}) => {
                 <TextInput
                   style={styles.inputBox}
                   onChangeText={text => setJobPackage(text)}
+                  keyboardType="numeric"
+                  maxLength={7}
                 />
               </View>
               <View style={styles.inputcontainerwithlabel}>
@@ -1028,6 +1078,7 @@ const AddMatrimonial = ({navigation}) => {
                   style={styles.inputBox}
                   onChangeText={text => setNumberOfBrothers(text)}
                   keyboardType="numeric"
+                  maxLength={2}
                 />
               </View>
               <View style={styles.inputcontainerwithlabel}>
@@ -1036,6 +1087,7 @@ const AddMatrimonial = ({navigation}) => {
                   style={styles.inputBox}
                   onChangeText={text => setNumberOfSisters(text)}
                   keyboardType="numeric"
+                  maxLength={2}
                 />
               </View>
               <View style={styles.inputcontainerwithlabel}>
@@ -1126,10 +1178,9 @@ const AddMatrimonial = ({navigation}) => {
                     </View>
 
                     <TextInput style={styles.browseInputBox} editable={false}>
-                      {documentData}
+                      {parsedPhotoData}
                     </TextInput>
                   </TouchableOpacity>
-                  <View></View>
                 </View>
                 <View style={styles.bottomshowcontainer}>
                   {parsedPhotoData &&
@@ -1162,7 +1213,7 @@ const AddMatrimonial = ({navigation}) => {
                     </View>
 
                     <TextInput style={styles.browseInputBox} editable={false}>
-                      {documentData}
+                      {parsedDocumentData ? documentData : ''}
                     </TextInput>
                   </TouchableOpacity>
                 </View>
@@ -1263,6 +1314,9 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   itemTextStyle: {
+    color: colors.black,
+  },
+  searchTextInput: {
     color: colors.black,
   },
   inputBox: {

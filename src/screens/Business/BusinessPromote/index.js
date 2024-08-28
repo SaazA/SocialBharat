@@ -119,7 +119,26 @@ const BusinessPromotion = ({navigation}) => {
       .catch(error => {
         // console.log('Error posting businessData:', error);
         // Alert.alert(
-        const errorMessage = error.message || 'An unexpected error occurred';
+        let errorMessage = 'An unexpected error occurred';
+
+        if (error.response) {
+          // Check if the response has data
+          if (error.response.data) {
+            const errorData = error.response.data;
+
+            // Check if there are specific errors or a general message
+            if (errorData.errors) {
+              // Extract the first error message, you can adjust this logic as needed
+              const firstErrorKey = Object.keys(errorData.errors)[0];
+              errorMessage = errorData.errors[firstErrorKey];
+            } else if (errorData.message) {
+              errorMessage = errorData.message;
+            }
+          }
+        } else {
+          // If no response, use the error's message
+          errorMessage = error.message;
+        }
         ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
         setIsPosting(false);
       });
@@ -135,32 +154,67 @@ const BusinessPromotion = ({navigation}) => {
     // Initialize an array to store error messages for each field
     const errors = [];
 
-    const validNumber = /^[6789]\d{9}$/;
-    if (!validNumber.test(contact)) {
-      Alert.alert(
-        'Please enter a valid 10-digit mobile number',
-        'starting with 6, 7, 8, or 9',
-      );
+    // Perform validations for each field
+
+    if (!businessName || !businessName.trim()) {
+      Alert.alert('Validation Error', 'Please select Enter Business Name');
+      return;
+    }
+    if (!category) {
+      Alert.alert('Validation Error', 'Please select Enter Category');
+      return;
+    }
+    if (!streetAddress || !streetAddress.trim()) {
+      Alert.alert('Validation Error', 'Please select Enter Street Address');
+      return;
+    }
+    if (!selectedCity) {
+      Alert.alert('Validation Error', 'Please select City');
+      return;
+    }
+    if (!contact || !contact.trim()) {
+      Alert.alert('Validation Error', 'Please select Enter contact');
+      return;
+    }
+    if (!selectedState) {
+      Alert.alert('Validation Error', 'Please select State');
+      return;
+    }
+    if (!status) {
+      Alert.alert('Validation Error', 'Please select Enter Status');
       return;
     }
 
-    // Perform validations for each field
-    if (
-      !category ||
-      !businessName ||
-      !selectedCity ||
-      // !parsedPhotoData ||
-      // !imageUri ||
-      !contact ||
-      !selectedState ||
-      !status ||
-      !streetAddress
-    ) {
-      errors.push('Please Fill out all the Mandatory Details');
-    }
+    // if (
+    //   !category ||
+    //   !businessName ||
+    //   !selectedCity ||
+    //   // !parsedPhotoData ||
+    //   // !imageUri ||
+    //   !contact ||
+    //   !selectedState ||
+    //   !status ||
+    //   !streetAddress
+    // ) {
+    //   errors.push('Please Fill out all the Mandatory Details');
+    // }
+
     if (errors.length > 0) {
       const errorMessage = errors.join('\n'); // Join error messages with newline character
       Alert.alert(errorMessage);
+      return;
+    }
+    const validNumber = /^[6789]\d{9}$/;
+    if (!validNumber.test(contact)) {
+      // console.log(error);
+      const errorMessage = 'Invalid Number';
+
+      // Show the error message in a toast
+      ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+      // Alert.alert(
+      //   'Please enter a valid 10-digit mobile number',
+      //   'starting with 6, 7, 8, or 9',
+      // );
       return;
     }
 
@@ -747,6 +801,9 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   itemTextStyle: {
+    color: colors.black,
+  },
+  searchTextInput: {
     color: colors.black,
   },
   showcontainerimage: {

@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   ToastAndroid,
+  Linking,
 } from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import {ScrollView, TextInput} from 'react-native-gesture-handler';
@@ -96,6 +97,13 @@ export default function Members({navigation}) {
         setIsFetching(false);
         console.log('Finished fetching data');
       });
+  };
+
+  const handlePhonePress = userId => {
+    if (membersData[userId].mobile) {
+      const phoneNumber = `tel:${membersData[userId].mobile}`;
+      Linking.openURL(phoneNumber);
+    }
   };
 
   const onRefresh = useCallback(() => {

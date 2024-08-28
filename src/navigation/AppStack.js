@@ -42,17 +42,17 @@ export default function AppStack() {
       <Stack.Screen
         name={'AddMatrimonial'}
         component={AddMatrimonial}
-        options={{headerShown: true}}
+        options={{headerShown: true, title: 'Add Matrimonial'}}
       />
       <Stack.Screen
         name={'ViewMatrimonial'}
         component={ViewMatrimonialProfile}
-        options={{headerShown: true}}
+        options={{headerShown: true, title: 'View Matrimonial'}}
       />
       <Stack.Screen
         name={'PracticeScreen'}
         component={Practice}
-        options={{headerShown: true}}
+        options={{headerShown: true, title: 'View Matrimonial'}}
       />
       <Stack.Screen
         name={'ChatScreenMatrimonial'}
@@ -62,57 +62,57 @@ export default function AppStack() {
       <Stack.Screen
         name={'ViewSpecificService'}
         component={ViewSpecificService}
-        options={{headerShown: true}}
+        options={{headerShown: true, title: 'Specific Service'}}
       />
       <Stack.Screen
         name={'RegisteredServicesByUser'}
         component={RegisteredServicesUser}
-        options={{headerShown: true}}
+        options={{headerShown: true, title: 'Registered Sevices'}}
       />
       <Stack.Screen
         name={'ViewProfile'}
         component={ViewMembers}
-        options={{headerShown: true}}
+        options={{headerShown: true, title: 'View Profile'}}
       />
       <Stack.Screen
         name={'ChatScreenMembers'}
         component={ChatScreenMembers}
-        options={{headerShown: false}}
+        options={{headerShown: false, title: 'Chat Screen'}}
       />
       <Stack.Screen
         name={'CreateJobScreen'}
         component={CreateJobScreen}
-        options={{headerShown: false}}
+        options={{headerShown: false, title: 'Create Job'}}
       />
       <Stack.Screen
         name={'UserAppliedJobs'}
         component={UserAppliedJobs}
-        options={{headerShown: false}}
+        options={{headerShown: false, title: 'Applied Jobs'}}
       />
       <Stack.Screen
         name={'ProfileScreen'}
         component={ProfileScreen}
-        options={{headerShown: false}}
+        options={{headerShown: false, title: 'Profile'}}
       />
       <Stack.Screen
         name={'BusinessPromote'}
         component={BusinessPromotion}
-        options={{headerShown: false}}
+        options={{headerShown: false, title: 'Promote Business'}}
       />
       <Stack.Screen
         name={'UserCreatedJobs'}
         component={UserCreatedJobs}
-        options={{headerShown: false}}
+        options={{headerShown: false, title: 'Created Jobs'}}
       />
       <Stack.Screen
         name={'EducationUpdate'}
         component={EducationUpdate}
-        options={{headerShown: false}}
+        options={{headerShown: false, title: 'Education Update'}}
       />
       <Stack.Screen
         name={'EventsScreen'}
         component={EventsScreen}
-        options={{headerShown: false}}
+        options={{headerShown: false, title: 'View Matrimonial'}}
       />
       <Stack.Screen
         name={'ActivitiesScreen'}

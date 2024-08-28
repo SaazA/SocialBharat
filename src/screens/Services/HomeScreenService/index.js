@@ -407,10 +407,7 @@ export default function Services({navigation}) {
           <View style={styles.headercontianer}>
             <Text style={styles.headertext}>All Services</Text>
           </View>
-          <View style={styles.contentcontainer}>
-            <View></View>
-            <View></View>
-          </View>
+          <View style={styles.contentcontainer}></View>
           <View style={styles.serviceview}>
             {/* <TextInput
           onChangeText={text => setSearchText(text)}
@@ -751,7 +748,7 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: 30,
-    maxHeight: 200,
+    maxHeight: 'auto',
     margin: 5,
     borderRadius: 5,
     backgroundColor: '#C5E2E6',

@@ -370,15 +370,59 @@ export default function JobsScreen({navigation}) {
     }
   };
 
+  // const selectDoc = () => {
+  //   return new Promise((resolve, reject) => {
+  //     DocumentPicker.pickSingle({
+  //       type: [DocumentPicker.types.pdf],
+  //     })
+  //       .then(doc => {
+  //         resolve(doc);
+  //         setDocumentData(doc.name);
+  //         UploadPDF(doc);
+  //       })
+  //       .catch(err => {
+  //         if (DocumentPicker.isCancel(err)) {
+  //           resolve();
+  //         } else {
+  //           reject(err);
+  //         }
+  //       });
+  //   });
+  // };
+  // const UploadPDF = data => {
+  //   console.log('Heyee', data);
+  //   uploadBiodataPdf(token, data)
+  //     .then(response => {
+  //       setParsedDocumentData(response.data.file);
+  //       console.log('parsedPDFData', response.data);
+  //     })
+  //     .catch(error => {
+  //       console.log('Error uploading pdf:', error);
+  //       const errorMessage = error.message || 'An unexpected error occurred';
+
+  //       // Show the error message in a toast
+  //       ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+  //       // setApiFailed(true);
+  //     });
+  // };
+
   const selectDoc = () => {
     return new Promise((resolve, reject) => {
       DocumentPicker.pickSingle({
         type: [DocumentPicker.types.pdf],
       })
         .then(doc => {
-          resolve(doc);
-          setDocumentData(doc.name);
-          UploadPDF(doc);
+          const fileSizeInMB = doc.size / (1024 * 1024); // Convert size to MB
+          if (fileSizeInMB > 5) {
+            // If file size exceeds 5 MB
+            const errorMessage = 'File size should not exceed 5 MB';
+            ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+            // reject(new Error(errorMessage));
+          } else {
+            resolve(doc);
+            setDocumentData(doc.name);
+            UploadPDF(doc);
+          }
         })
         .catch(err => {
           if (DocumentPicker.isCancel(err)) {
@@ -389,6 +433,7 @@ export default function JobsScreen({navigation}) {
         });
     });
   };
+
   const UploadPDF = data => {
     console.log('Heyee', data);
     uploadBiodataPdf(token, data)
@@ -402,7 +447,7 @@ export default function JobsScreen({navigation}) {
 
         // Show the error message in a toast
         ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
-        setApiFailed(true);
+        // setApiFailed(true);
       });
   };
 
@@ -668,7 +713,7 @@ export default function JobsScreen({navigation}) {
                         <TextInput
                           style={styles.browseInputBox}
                           editable={false}>
-                          {documentData}
+                          {parsedDocumentData ? documentData : ''}
                         </TextInput>
                       </TouchableOpacity>
 

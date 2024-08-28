@@ -210,9 +210,9 @@ const ViewSpecificService = ({route, navigation}) => {
   };
 
   const navigateToChatScreen = (partnerId, partnerName) => {
-    navigation.navigate('ChatScreenMatrimonial', {
-      partnerId: partnerId,
-      partnerName: partnerName,
+    navigation.navigate('ChatScreenMembers', {
+      memberId: partnerId,
+      memberName: partnerName,
     });
   };
   return (
@@ -371,7 +371,9 @@ const ViewSpecificService = ({route, navigation}) => {
                       }}>
                       <Text style={styles.labeltext}>Contact Number 1 : </Text>
                       <TouchableOpacity onPress={handlePhonePress}>
-                        <Text style={styles.labeltext}>{item.mobile1} </Text>
+                        <Text style={[styles.labeltext, styles.bluetext]}>
+                          {item.mobile1}{' '}
+                        </Text>
                       </TouchableOpacity>
                     </View>
                     {item.mobile2 ? (
@@ -382,7 +384,9 @@ const ViewSpecificService = ({route, navigation}) => {
                         }}>
                         <Text style={styles.labeltext}>Contact Number 2 :</Text>
                         <TouchableOpacity onPress={handlePhonePress}>
-                          <Text style={styles.labeltext}>{item.mobile2} </Text>
+                          <Text style={[styles.labeltext, styles.bluetext]}>
+                            {item.mobile2}
+                          </Text>
                         </TouchableOpacity>
                       </View>
                     ) : (
@@ -553,6 +557,9 @@ const styles = StyleSheet.create({
   searchbox: {
     color: colors.black,
     flex: 1,
+  },
+  bluetext: {
+    color: colors.blue,
   },
 
   headservicetext: {

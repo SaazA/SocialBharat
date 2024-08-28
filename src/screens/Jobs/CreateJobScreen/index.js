@@ -51,12 +51,12 @@ const CreateJobScreen = ({navigation}) => {
   const [parsedPhotoData, setParsedPhotoData] = useState('');
   const [documentData, setDocumentData] = useState('');
   const [parsedDocumentData, setParsedDocumentData] = useState('');
-  const [decisionResume, setDecisionResume] = useState('No');
-  const [decisionUrl, setDecisionUrl] = useState('No');
+  const [decisionResume, setDecisionResume] = useState();
+  const [decisionUrl, setDecisionUrl] = useState();
   const [dataLoadedForResume, setDataLoadedforResume] = useState('');
   const [dataLoadedForUrl, setDataLoadedforUrl] = useState('');
   const [decisionForResume, setDecisionForResume] = useState(0);
-  const [decisionForUrl, setDecisionForUrl] = useState('Inactive');
+  const [decisionForUrl, setDecisionForUrl] = useState();
   const [jobtitle, setjobtitle] = useState('');
   const [subHeading, setSubHeading] = useState('');
   const [fee, setfee] = useState('');
@@ -65,10 +65,11 @@ const CreateJobScreen = ({navigation}) => {
   const [description, setDescripton] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [apiFailed, setApiFailed] = useState(false);
+  const [activeForUrlApply, setActiveForUrlApply] = useState(false);
   const token = useSelector(state => state.AuthReducer.authToken);
 
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+
   const createNewJob = (
     job_title,
     job_sector,
@@ -112,18 +113,63 @@ const CreateJobScreen = ({navigation}) => {
         formsubmitted();
       })
       .catch(error => {
-        // console.log(error);
-        const errorMessage = error.message || 'An unexpected error occurred';
+        console.log(error.response.data);
+        // const errorMessage = error.message || 'An unexpected error occurred';
 
-        // Show the error message in a toast
+        // // Show the error message in a toast
+        // ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+
+        let errorMessage = 'An unexpected error occurred';
+
+        if (error.response) {
+          // Check if the response has data
+          if (error.response.data) {
+            const errorData = error.response.data;
+
+            // Check if there are specific errors or a general message
+            if (errorData.errors) {
+              // Extract the first error message, you can adjust this logic as needed
+              const firstErrorKey = Object.keys(errorData.errors)[0];
+              errorMessage = errorData.errors[firstErrorKey];
+            } else if (errorData.message) {
+              errorMessage = errorData.message;
+            }
+          }
+        } else {
+          // If no response, use the error's message
+          errorMessage = error.message;
+        }
+
         ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
       });
+  };
+
+  const addOneDay = date => {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() + 1);
+    return newDate;
   };
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     getStateData();
     setRefreshing(false);
+    setjobtitle(),
+      setOccupation(null),
+      setOccupationtype(null),
+      setSubHeading(),
+      setAddress(),
+      setParsedDocumentData(),
+      setParsedPhotoData(),
+      setDescripton(),
+      setApplyLinkUrl(),
+      setDecisionForUrl(),
+      setFormattedStartDateForSending(),
+      setFormattedEndDateForSending(),
+      setfee(),
+      setStartDate(null);
+    setEndDate(null);
+    setSelectedState(null), setSelectedCity(null), setDecisionForResume();
   }, []);
 
   const formsubmitted = () => {
@@ -268,6 +314,39 @@ const CreateJobScreen = ({navigation}) => {
     setFormattedEndDateForSending(formatDateforSending(endDate));
   }, [endDate]);
 
+  // const selectDoc = () => {
+  //   console.log(formattedEndDateForSending + 'DATEE');
+  //   return new Promise((resolve, reject) => {
+  //     DocumentPicker.pickSingle({
+  //       type: [DocumentPicker.types.pdf],
+  //     })
+  //       .then(doc => {
+  //         resolve(doc);
+  //         setDocumentData(doc.name);
+  //         UploadPDF(doc);
+  //       })
+  //       .catch(err => {
+  //         if (DocumentPicker.isCancel(err)) {
+  //           resolve();
+  //         } else {
+  //           reject(err);
+  //         }
+  //       });
+  //   });
+  // };
+
+  // const UploadPDF = data => {
+  //   console.log('Heyee', data);
+  //   uploadBiodataPdf(token, data)
+  //     .then(response => {
+  //       setParsedDocumentData(response.data.file);
+  //       console.log('parsedPDFData', response.data);
+  //     })
+  //     .catch(error => {
+  //       console.log('Error uploading pdf:', error);
+  //     });
+  // };
+
   const selectDoc = () => {
     console.log(formattedEndDateForSending + 'DATEE');
     return new Promise((resolve, reject) => {
@@ -275,9 +354,17 @@ const CreateJobScreen = ({navigation}) => {
         type: [DocumentPicker.types.pdf],
       })
         .then(doc => {
-          resolve(doc);
-          setDocumentData(doc.name);
-          UploadPDF(doc);
+          const fileSizeInMB = doc.size / (1024 * 1024); // Convert size to MB
+          if (fileSizeInMB > 5) {
+            // If file size exceeds 5 MB
+            const errorMessage = 'File size should not exceed 5 MB';
+            ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+            // reject(new Error(errorMessage));
+          } else {
+            resolve(doc);
+            setDocumentData(doc.name);
+            UploadPDF(doc);
+          }
         })
         .catch(err => {
           if (DocumentPicker.isCancel(err)) {
@@ -301,6 +388,34 @@ const CreateJobScreen = ({navigation}) => {
       });
   };
 
+  const selectPhoto = () => {
+    return new Promise((resolve, reject) => {
+      DocumentPicker.pickSingle({
+        type: [DocumentPicker.types.images],
+      })
+        .then(doc => {
+          const fileSizeInMB = doc.size / (1024 * 1024); // Convert size to MB
+          if (fileSizeInMB > 5) {
+            // If file size exceeds 5 MB
+            const errorMessage = 'File size should not exceed 5 MB';
+            ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
+            // reject(new Error(errorMessage));
+          } else {
+            resolve(doc);
+            setImageUri(doc.uri);
+            UploadImage(doc);
+          }
+        })
+        .catch(err => {
+          if (DocumentPicker.isCancel(err)) {
+            resolve();
+          } else {
+            reject(err);
+          }
+        });
+    });
+  };
+
   const UploadImage = data => {
     console.log('Heyee', data);
     uploadSingleImage(token, data)
@@ -315,6 +430,39 @@ const CreateJobScreen = ({navigation}) => {
     console.log('asss' + parsedPhotoData);
   };
 
+  // const UploadImage = data => {
+  //   console.log('Heyee', data);
+  //   uploadSingleImage(token, data)
+  //     .then(response => {
+  //       setParsedPhotoData(response.data.image);
+  //       console.log('parsedphotoData', response.data.image);
+  //     })
+  //     .catch(error => {
+  //       console.log('Error uploading images:', error);
+  //     });
+
+  //   console.log('asss' + parsedPhotoData);
+  // };
+
+  // const selectPhoto = () => {
+  //   return new Promise((resolve, reject) => {
+  //     DocumentPicker.pickSingle({
+  //       type: [DocumentPicker.types.images],
+  //     })
+  //       .then(doc => {
+  //         resolve(doc);
+  //         setImageUri(doc.uri);
+  //         UploadImage(doc);
+  //       })
+  //       .catch(err => {
+  //         if (DocumentPicker.isCancel(err)) {
+  //           resolve();
+  //         } else {
+  //           reject(err);
+  //         }
+  //       });
+  //   });
+  // };
   // const selectPhoto = () => {
   //   return new Promise((resolve, reject) => {
   //     DocumentPicker.pick({
@@ -342,26 +490,6 @@ const CreateJobScreen = ({navigation}) => {
   //       });
   //   });
   // };
-
-  const selectPhoto = () => {
-    return new Promise((resolve, reject) => {
-      DocumentPicker.pickSingle({
-        type: [DocumentPicker.types.images],
-      })
-        .then(doc => {
-          resolve(doc);
-          setImageUri(doc.uri);
-          UploadImage(doc);
-        })
-        .catch(err => {
-          if (DocumentPicker.isCancel(err)) {
-            resolve();
-          } else {
-            reject(err);
-          }
-        });
-    });
-  };
 
   const handleDeletePhoto = () => {
     setParsedPhotoData(null);
@@ -413,8 +541,10 @@ const CreateJobScreen = ({navigation}) => {
   const handleApplyUrl = item => {
     if (item.value === 'Yes') {
       setDecisionForUrl('Active');
+      setActiveForUrlApply(true);
     } else {
       setDecisionForUrl('Inactive');
+      setActiveForUrlApply(false);
     }
     setDecisionUrl(item.value);
     console.log(item.value);
@@ -451,29 +581,77 @@ const CreateJobScreen = ({navigation}) => {
     }
   };
 
+  useEffect(() => {
+    // Assume setActiveForUrlApply() is a function that returns true or false based on some logic
+    const isActive = setActiveForUrlApply();
+    setActiveForUrlApply(isActive);
+  }, []);
+
   const handleSubmit = () => {
     // Initialize an array to store error messages for each field
     const errors = [];
 
-    // Perform validations for each field
-    if (
-      !jobtitle ||
-      !occupation ||
-      !selectedCity ||
-      !occupationtype ||
-      !selectedState ||
-      !formattedStartDateForSending ||
-      !formattedEndDateForSending ||
-      !fee ||
-      !description
-    ) {
-      errors.push('Please Fill out all the Mandatory Details');
-    }
-    if (errors.length > 0) {
-      const errorMessage = errors.join('\n'); // Join error messages with newline character
-      Alert.alert(errorMessage);
+    if (!jobtitle || !jobtitle.trim()) {
+      Alert.alert('Validation Error', 'Please select Enter Job Title');
       return;
     }
+    if (!occupation) {
+      Alert.alert('Validation Error', 'Please select a Job Sector.');
+      return;
+    }
+    if (!occupationtype) {
+      Alert.alert('Validation Error', 'Please select a Job Profile.');
+      return;
+    }
+    if (!selectedCity) {
+      Alert.alert('Validation Error', 'Please select a City.');
+      return;
+    }
+
+    if (!selectedState) {
+      Alert.alert('Validation Error', 'Please select a State.');
+      return;
+    }
+    if (!formattedStartDateForSending) {
+      Alert.alert('Validation Error', 'Please select a Start Date.');
+      return;
+    }
+    if (!formattedEndDateForSending) {
+      Alert.alert('Validation Error', 'Please select the end Date.');
+      return;
+    }
+    if (!fee || !fee.trim()) {
+      Alert.alert('Validation Error', 'Please enter a fee.');
+      return;
+    }
+    if (!decisionForUrl) {
+      Alert.alert('Validation Error', 'Please select the decision for Url.');
+      return;
+    }
+    if (!description || !fee.trim()) {
+      Alert.alert('Validation Error', 'Please select a description.');
+      return;
+    }
+
+    // Perform validations for each field
+    // if (
+    //   !jobtitle ||
+    //   !occupation ||
+    //   !selectedCity ||
+    //   !occupationtype ||
+    //   !selectedState ||
+    //   !formattedStartDateForSending ||
+    //   !formattedEndDateForSending ||
+    //   !fee ||
+    //   !description
+    // ) {
+    //   errors.push('Please Fill out all the Mandatory Details');
+    // }
+    // if (errors.length > 0) {
+    //   const errorMessage = errors.join('\n'); // Join error messages with newline character
+    //   Alert.alert(errorMessage);
+    //   return;
+    // }
 
     createNewJob(
       jobtitle,
@@ -708,7 +886,7 @@ const CreateJobScreen = ({navigation}) => {
             <View style={styles.contentcontainer}>
               <Text style={styles.labeltext}>
                 Short Information about Application Fee
-                <Text style={{color: colors.danger}}>*</Text>
+                <Text style={{color: colors.danger}}> *</Text>
               </Text>
               <TextInput
                 style={styles.inputbox}
@@ -755,6 +933,9 @@ const CreateJobScreen = ({navigation}) => {
                       );
                     } else {
                       setStartDate(selectedDate);
+                      if (!endDate || selectedDate >= endDate) {
+                        setEndDate(addOneDay(selectedDate));
+                      }
                     }
                     setOpenStartPicker(false);
                   }}
@@ -785,10 +966,10 @@ const CreateJobScreen = ({navigation}) => {
                   modal
                   mode="date"
                   open={openEndPicker}
-                  date={endDate || startDate || today}
-                  minimumDate={startDate || today}
+                  date={endDate || addOneDay(startDate) || addOneDay(today)}
+                  minimumDate={addOneDay(startDate) || addOneDay(today)}
                   onConfirm={selectedDate => {
-                    if (startDate && selectedDate < startDate) {
+                    if (startDate && selectedDate < addOneDay(startDate)) {
                       // Handle the error: end date is before start date
                       Alert.alert(
                         'Invalid Date',
@@ -867,7 +1048,7 @@ const CreateJobScreen = ({navigation}) => {
                   </View>
 
                   <TextInput style={styles.browseInputBox} editable={false}>
-                    {documentData}
+                    {parsedPhotoData}
                   </TextInput>
                 </TouchableOpacity>
               </View>
@@ -893,19 +1074,11 @@ const CreateJobScreen = ({navigation}) => {
                 )}
               </View>
             </View>
-            <View style={styles.contentcontainer}>
-              <Text style={styles.labeltext}>Apply Link</Text>
-              <TextInput
-                style={styles.inputbox}
-                placeholderTextColor={colors.black}
-                placeholder="Enter the Link"
-                value={applyLinkUrl}
-                onChangeText={text => {
-                  setApplyLinkUrl(text);
-                }}></TextInput>
-            </View>
+
             <View style={styles.dropdowncontainer}>
-              <Text style={styles.labeltext}>Apply From URL?</Text>
+              <Text style={styles.labeltext}>
+                Apply From URL? <Text style={{color: colors.danger}}>*</Text>
+              </Text>
               <Dropdown
                 style={styles.dropdown}
                 data={decision}
@@ -941,6 +1114,18 @@ const CreateJobScreen = ({navigation}) => {
                 }}
               />
             </View>
+            <View style={styles.contentcontainer}>
+              <Text style={styles.labeltext}>Apply Link</Text>
+              <TextInput
+                style={styles.inputbox}
+                placeholderTextColor={colors.black}
+                placeholder="Enter the Link"
+                value={applyLinkUrl}
+                onChangeText={text => {
+                  setApplyLinkUrl(text);
+                }}
+                editable={activeForUrlApply}></TextInput>
+            </View>
             <View style={styles.dropdowncontainer}>
               <Text style={styles.labeltext}>Apply With Resume?</Text>
               <Dropdown
@@ -953,6 +1138,7 @@ const CreateJobScreen = ({navigation}) => {
                 labelField="label"
                 valueField="value"
                 maxHeight={300}
+                placeholder={'--Select--'}
                 // placeholder={decisionResume}
                 value={decisionResume}
                 onChange={handleApplyResume}
