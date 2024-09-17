@@ -35,8 +35,8 @@ const styles = StyleSheet.create({
   },
   infobox: {
     flex: 0.6,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
 });
 

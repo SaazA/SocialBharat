@@ -341,9 +341,11 @@ const ProfileScreen = ({navigation}) => {
                         ).map((item, index) => (
                           <View style={styles.cardcontainer} key={index}>
                             <View style={styles.uppercard}>
-                              <Text style={{color: 'black'}}>
-                                {item.matrimonial_profile_name}
-                              </Text>
+                              <View style={styles.matrimonialuppercardtext}>
+                                <Text style={{color: 'black'}}>
+                                  {item.matrimonial_profile_name}
+                                </Text>
+                              </View>
                               <View style={styles.imagecontainer}>
                                 <Image
                                   style={{width: '100%', height: '100%'}}
@@ -973,7 +975,9 @@ const styles = StyleSheet.create({
   },
   uppercard: {
     flexDirection: 'row',
-    height: 70,
+    minHeight: 70,
+    flex: 1,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'space-around',
   },
@@ -989,6 +993,10 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: 10,
     height: 30,
+  },
+  matrimonialuppercardtext: {
+    flex: 0.8,
+    padding: 5,
   },
   imagecontainer: {
     height: 60,

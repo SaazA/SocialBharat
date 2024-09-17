@@ -73,19 +73,22 @@ const OTP_VERIFY_LOGIN = ({navigation, route}) => {
         let errorMessage;
 
         if (error.response && error.response.data) {
-          console.log('h');
           const {message, errors} = error.response.data;
-          //   console.log(errors);
-          for (const key in errors) {
-            if (errors.hasOwnProperty(key)) {
-              errorMessage = errors[key];
-              //   console.log(`${errorMessage}`);
-            }
+
+          if (errors && Object.keys(errors).length > 0) {
+            // Extract the first error message
+            const firstErrorKey = Object.keys(errors)[0];
+            errorMessage = errors[firstErrorKey];
+          } else if (message) {
+            errorMessage = message;
           }
-        } else if (error) {
+        } else {
+          // If no response or no specific error, use the error's message
+          errorMessage = error.message;
           setApiFailed(true);
           return;
         }
+
         // let errorMessage;
 
         ToastAndroid.show(

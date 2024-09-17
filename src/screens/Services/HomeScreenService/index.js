@@ -62,12 +62,12 @@ export default function Services({navigation}) {
         setServiceData(filteredData);
       })
       .catch(error => {
-        console.log('sss');
+        console.log(error.response.data);
         const errorMessage = error.message || 'An unexpected error occurred';
 
         // Show the error message in a toast
         ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
-        setApiFailed(true);
+        // setApiFailed(true);
       });
   };
 

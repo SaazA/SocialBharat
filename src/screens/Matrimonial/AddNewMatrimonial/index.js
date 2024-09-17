@@ -122,33 +122,6 @@ const AddMatrimonial = ({navigation}) => {
     state,
     subcast_id,
   ) => {
-    // console.log('sasas' + biodata);
-    // console.log(
-    //   biodata,
-    //   brother_count,
-    //   city,
-    //   contact_number,
-    //   description,
-    //   education,
-    //   father_name,
-    //   height_in_feet,
-    //   is_manglik,
-    //   maternal_gotra,
-    //   matrimonial_profile_dob,
-    //   matrimonial_profile_gender,
-    //   matrimonial_profile_name,
-    //   matrimonial_profile_occupation,
-    //   mother_name,
-    //   paternal_gotra,
-    //   profile_created_for,
-    //   proposal_photos,
-    //   salary_package,
-    //   sister_count,
-    //   sisters_details,
-    //   skin_tone,
-    //   state,
-    //   subcast_id,
-    // );
     createMatrimonialProfile(
       token,
       biodata,
@@ -182,13 +155,26 @@ const AddMatrimonial = ({navigation}) => {
         navigation.navigate(routes.MATRIMONIALSCREEN);
       })
       .catch(error => {
-        // console.log(error);
-        const {errors, message} = error.response.data;
-        console.log(error, errors, message);
-        // Alert.alert(JSON.stringify(errors));
-        Alert.alert(Object.values(errors).join('\n'));
-        const errorMessage = error.message || 'An unexpected error occurred';
+        let errorMessage = 'An unexpected error occurred';
 
+        if (error.response) {
+          // Check if the response has data
+          if (error.response.data) {
+            const errorData = error.response.data;
+
+            // Check if there are specific errors or a general message
+            if (errorData.errors) {
+              // Extract the first error message, you can adjust this logic as needed
+              const firstErrorKey = Object.keys(errorData.errors)[0];
+              errorMessage = errorData.errors[firstErrorKey];
+            } else if (errorData.message) {
+              errorMessage = errorData.message;
+            }
+          }
+        } else {
+          // If no response, use the error's message
+          errorMessage = error.message;
+        }
         // Show the error message in a toast
         ToastAndroid.show(errorMessage, ToastAndroid.SHORT);
       });
@@ -716,6 +702,7 @@ const AddMatrimonial = ({navigation}) => {
                 <TextInput
                   style={styles.inputBox}
                   onChangeText={text => setName(text)}
+                  maxLength={30}
                 />
               </View>
               <View style={styles.inputcontainerwithlabel}>

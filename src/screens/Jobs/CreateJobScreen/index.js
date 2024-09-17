@@ -177,18 +177,14 @@ const CreateJobScreen = ({navigation}) => {
   };
 
   const getCitiesData = stateId => {
-    try {
-      getCities(token, stateId)
-        .then(response => {
-          console.log('Cities' + response.data);
-          setCityData(response.data);
-        })
-        .catch(error => {
-          console.log(error);
-        });
-    } catch (error) {
-      // console.log(error);
-    }
+    getCities(token, stateId)
+      .then(response => {
+        console.log('Cities' + response.data);
+        setCityData(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
   };
   const cityDropDownOptions = cityData
     ? cityData.map(city => ({
